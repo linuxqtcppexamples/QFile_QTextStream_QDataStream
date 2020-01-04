@@ -68,8 +68,13 @@ QDir:
 The QDir class provides access to directory structures and their contents. 
 
 qDebug() is used for writing custom debug output.
+
 qInfo() is used for informational messages.
+
 qWarning() is used to report warnings and recoverable errors in your application.
+
 qCritical() is used for writing critical error messages and reporting system errors.
+
 qFatal() is used for writing fatal error messages shortly before exiting.
+
 ----------
