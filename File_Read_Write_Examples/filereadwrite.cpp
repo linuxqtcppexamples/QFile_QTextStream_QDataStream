@@ -28,22 +28,26 @@ void CFileReadWrite::on_m_pbWrite_clicked()
 
    if(strData.isEmpty())
    {
-    QMessageBox::warning(this,"Alert", "Data is empty");
-    return;
+       QMessageBox::warning(this,"Alert", "Data is empty");
+       return;
    }
 
    QString strFileName=ui->m_leWriteFileName->text();
 
    if(strFileName.isEmpty())
    {
-    QMessageBox::warning(this,"Alert", "Filename is empty");
-    return;
+       QMessageBox::warning(this,"Alert", "Filename is empty");
+       return;
    }
 
-   QFileInfo fileInfo(strFileName);
-   if(fileInfo.completeSuffix() != "txt")
+   int nDataType=ui->m_cmbxWriteDataSaveType->currentIndex();
+   if(0 == nDataType)//text format
    {
-        strFileName.append(".txt");
+       QFileInfo fileInfo(strFileName);
+       if(fileInfo.completeSuffix() != "txt")
+       {
+           strFileName.append(".txt");
+       }
    }
 
    QFile file(QDir::currentPath()+"/"+strFileName);
@@ -51,7 +55,6 @@ void CFileReadWrite::on_m_pbWrite_clicked()
    {
       qInfo() << "file opened for writing" << endl;
 
-      int nDataType=ui->m_cmbxWriteDataSaveType->currentIndex();
       if(0 == nDataType)//text format
       {
         QTextStream txtStr(&file);
@@ -68,7 +71,6 @@ void CFileReadWrite::on_m_pbWrite_clicked()
        QMessageBox::critical(this,"Fatal Error", "Unable to open file to write data." );
 
    }
-
 
 }
 
@@ -95,38 +97,47 @@ void CFileReadWrite::on_m_pbRead_clicked()
               QTextStream txtStr(&file);
               strData = txtStr.readAll();
 
-
         }else
         {
                 QByteArray ba;
                 QDataStream dataStr(&ba,QFile::ReadWrite);
                 dataStr <<  file.readAll();
                 strData = ba.toHex();
-
         }
 
         ui->m_teDataReadFromFile->setPlainText(strData);
 
         file.close();
-        QMessageBox::information(this,"Information", "File read successfully from "+strReadFileName );
 
+        QMessageBox::information(this,"Information", "File read successfully from "+strReadFileName );
 
     }else
     {
         QMessageBox::critical(this,"Fatal Error", "Unable to open file to read data" );
-
     }
 }
 
 void CFileReadWrite::on_m_pbSelectFile_clicked()
 {
-    QString selectedFileName = QFileDialog::getOpenFileName(this,
-        tr("Select text file"), QDir::currentPath(), tr("Text Files (*.txt)"));
+    int nDataType=ui->m_cmbxReadDataSaveType->currentIndex();
+
+    QString selectedFileName;
+
+    if( 0 == nDataType )
+    {
+        selectedFileName = QFileDialog::getOpenFileName(this,
+            tr("Select text file"), QDir::currentPath(), tr("Text Files (*.txt)"));
+    }else
+    {
+        selectedFileName = QFileDialog::getOpenFileName(this,
+            tr("Select binary file"), QDir::currentPath(), tr("Binary Files (*.*)"));
+    }
 
     if(selectedFileName.isEmpty())
     {
         QMessageBox::warning(this,"Alert", "Filename is empty");
         return;
     }
+
     ui->m_leReadFileName->setText(selectedFileName);
 }
